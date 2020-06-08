@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{3C72722D-4A02-49A6-ABF5-ED6C71491677}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoorNet.Client", "DoorNet.Client\DoorNet.Client.csproj", "{1BC4616F-8FE2-4506-8853-0B114D4C853D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{C582549F-39F0-4944-9389-A27F97A12862}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoorNet.Shared", "DoorNet.Shared\DoorNet.Shared.csproj", "{E21C78F5-6DA8-4384-8321-4647564E11EB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{19C4B86C-8CAC-4594-86E5-29BFF7A0F5D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoorNet.Server", "DoorNet.Server\DoorNet.Server.csproj", "{0B9D09AE-C916-4EF5-9FAE-F59AF8E4FBBF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BC4616F-8FE2-4506-8853-0B114D4C853D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BC4616F-8FE2-4506-8853-0B114D4C853D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BC4616F-8FE2-4506-8853-0B114D4C853D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BC4616F-8FE2-4506-8853-0B114D4C853D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E21C78F5-6DA8-4384-8321-4647564E11EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E21C78F5-6DA8-4384-8321-4647564E11EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E21C78F5-6DA8-4384-8321-4647564E11EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E21C78F5-6DA8-4384-8321-4647564E11EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B9D09AE-C916-4EF5-9FAE-F59AF8E4FBBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B9D09AE-C916-4EF5-9FAE-F59AF8E4FBBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B9D09AE-C916-4EF5-9FAE-F59AF8E4FBBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B9D09AE-C916-4EF5-9FAE-F59AF8E4FBBF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1BC4616F-8FE2-4506-8853-0B114D4C853D} = {3C72722D-4A02-49A6-ABF5-ED6C71491677}
+		{E21C78F5-6DA8-4384-8321-4647564E11EB} = {C582549F-39F0-4944-9389-A27F97A12862}
+		{0B9D09AE-C916-4EF5-9FAE-F59AF8E4FBBF} = {19C4B86C-8CAC-4594-86E5-29BFF7A0F5D3}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B62D8841-FE3F-416C-9A53-4BB2CEC3B527}
+	EndGlobalSection
+EndGlobal
