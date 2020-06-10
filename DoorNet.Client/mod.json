@@ -1,0 +1,9 @@
+﻿{
+  "FriendlyName": "DoorNet.Client",
+  "Author": "BobTheBob",
+  "Contact": "BobTheBob#1150",
+  "ModuleFileName": "DoorNet.Client.dll",
+  "Priority": 10,
+  "SkipLoad": false,
+  "Dependencies": []
+}
