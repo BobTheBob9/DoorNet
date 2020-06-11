@@ -35,12 +35,8 @@
     <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lib.Harmony.1.2.0.1\lib\net35\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-dev, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Centrifuge.GameSupport.GTTOD.1.0.1\lib\net40\Assembly-CSharp-dev.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Centrifuge.GTTOD, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Centrifuge.GameSupport.GTTOD.1.0.1\lib\net40\Centrifuge.GTTOD.dll</HintPath>
+    <Reference Include="Assembly-CSharp.dev">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Get To The Orange Door\Get To The Orange Door_Data\Managed\Assembly-CSharp.dev.dll</HintPath>
     </Reference>
     <Reference Include="LitJSON, Version=0.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LitJson.0.15.0\lib\net40\LitJSON.dll</HintPath>
@@ -75,6 +71,16 @@
   <ItemGroup>
     <None Include="mod.json" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DoorNet.Server\DoorNet.Server.csproj">
+      <Project>{0b9d09ae-c916-4ef5-9fae-f59af8e4fbbf}</Project>
+      <Name>DoorNet.Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DoorNet.Shared\DoorNet.Shared.csproj">
+      <Project>{e21c78f5-6da8-4384-8321-4647564e11eb}</Project>
+      <Name>DoorNet.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
