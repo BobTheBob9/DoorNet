@@ -1,6 +1,6 @@
 ﻿namespace DoorNet.Shared.Networking
 {
-	public enum ManagerType
+	public enum Side
 	{
 		Client,
 		Server

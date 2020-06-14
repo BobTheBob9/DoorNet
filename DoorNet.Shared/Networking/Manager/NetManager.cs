@@ -24,7 +24,7 @@ namespace DoorNet.Shared.Networking
 		public NetHandle Server {
 			get
 			{
-				if (Side != ManagerType.Client)
+				if (Side != Side.Client)
 					throw new IncorrectManagerTypeException("NetManager.Server can only be accessed from client NetManagers");
 
 				return Clients[0];
@@ -34,7 +34,7 @@ namespace DoorNet.Shared.Networking
 		public List<NetHandle> Clients = new List<NetHandle>();
 		public bool InUse = false;
 		public int Port = 27272;
-		public ManagerType Side;
+		public Side Side;
 
 		public NetHandler SyncronisePacketListHandler;
 		public NetHandler ClientDroppedHandler;
@@ -61,17 +61,17 @@ namespace DoorNet.Shared.Networking
 		/// </summary>
 		/// <param name="type">Whether the NetManager is a client or server</param>
 		/// <param name="port">If the NetManager is a server, the port it should listen on</param>
-		public NetManager(ManagerType type, int port = -1)
+		public NetManager(Side type, int port = -1)
 		{
 			Side = type;
 
-			if (Side == ManagerType.Server && port == -1)
+			if (Side == Side.Server && port == -1)
 				throw new IncorrectManagerTypeException("You must provide a port for server NetManagers");
-			else if (Side == ManagerType.Server)
+			else if (Side == Side.Server)
 				Port = port;
 
 			int maxChunkSize = 4096 - TCP_PACKET_HEADER_SIZE;
-			if (type == ManagerType.Client)
+			if (type == Side.Client)
 			{
 				//handle for clients
 				SyncronisePacketListHandler = Handle("DoorNet::Shared::Networking::SyncronisePacketListWithHost");
@@ -207,7 +207,7 @@ namespace DoorNet.Shared.Networking
 				});
 			}
 
-			if (type == ManagerType.Client)
+			if (type == Side.Client)
 			{
 				ClientDroppedHandler = Handle("DoorNet::Shared::Networking::ClientDropped");
 				ClientDroppedHandler.Listen((byte[] data, NetHandle sender) =>
@@ -222,7 +222,7 @@ namespace DoorNet.Shared.Networking
 			}
 
 			UdpHandshakeHandler = Handle("DoorNet::Shared::Networking::UdpHandshake");
-			if (type == ManagerType.Client)
+			if (type == Side.Client)
 			{
 				UdpHandshakeHandler.Listen((byte[] data, NetHandle sender) =>
 				{
@@ -248,7 +248,7 @@ namespace DoorNet.Shared.Networking
 			Udp = new UdpClient(Port);
 			UdpThread = new Thread(UdpThreadListen);
 
-			if (type == ManagerType.Client)
+			if (type == Side.Client)
 			{
 				TcpClient = new TcpClient();
 				TcpThread = new Thread(TcpThreadClientListen);
@@ -313,7 +313,7 @@ namespace DoorNet.Shared.Networking
 
 					//resolve handle
 					NetHandle foundHandle = null;
-					if (Side == ManagerType.Client)
+					if (Side == Side.Client)
 						foundHandle = Clients[0]; //should be the connected handle
 					else
 						foreach (NetHandle handle in Clients)
@@ -379,7 +379,7 @@ namespace DoorNet.Shared.Networking
 
 					//resolve handle
 					NetHandle foundHandle = null;
-					if (Side == ManagerType.Client)
+					if (Side == Side.Client)
 						foundHandle = Clients[0];
 					else
 						foreach (NetHandle handle in Clients)
@@ -399,7 +399,7 @@ namespace DoorNet.Shared.Networking
 				TcpThreadPackets.Clear();
 			}
 
-			if (Side == ManagerType.Client && UdpHandshakeGuid != null && !UdpReady)
+			if (Side == Side.Client && UdpHandshakeGuid != null && !UdpReady)
 			{
 				UdpHandshakeHandler.SendTo(Clients[0], UdpHandshakeGuid.Value.ToByteArray(), SendMode.Udp);
 			}
@@ -424,7 +424,7 @@ namespace DoorNet.Shared.Networking
 
 				NetworkStream stream;
 
-				if (Side == ManagerType.Server)
+				if (Side == Side.Server)
 					stream = reciever.Client.GetStream();
 				else
 					stream = TcpClient.GetStream();
@@ -434,7 +434,7 @@ namespace DoorNet.Shared.Networking
 			}
 			else
 			{
-				if ((Side == ManagerType.Server && !reciever.HasUdp) || (Side == ManagerType.Client && !UdpReady && handlerID != UdpHandshakeHandler.ShortID)) //hell check fix later
+				if ((Side == Side.Server && !reciever.HasUdp) || (Side == Side.Client && !UdpReady && handlerID != UdpHandshakeHandler.ShortID)) //hell check fix later
 					return;
 
 				//udp header contains channel id
@@ -451,7 +451,7 @@ namespace DoorNet.Shared.Networking
 		/// </summary>
 		public void StartServer()
 		{
-			if (Side != ManagerType.Server)
+			if (Side != Side.Server)
 				throw new IncorrectManagerTypeException("StartServer() can only be called on server NetManagers");
 
 			InUse = true;
@@ -471,7 +471,7 @@ namespace DoorNet.Shared.Networking
 		/// </summary>
 		public void StopServer()
 		{
-			if (Side != ManagerType.Server)
+			if (Side != Side.Server)
 				throw new IncorrectManagerTypeException("StopServer() can only be called on server NetManagers");
 
 			ServerEvents.InvokeOnServerClose();
@@ -495,7 +495,7 @@ namespace DoorNet.Shared.Networking
 		/// <param name="hostEp">The EP of the host you're connecting to</param>
 		public void Connect(IPEndPoint hostEp)
 		{
-			if (Side != ManagerType.Client)
+			if (Side != Side.Client)
 				throw new IncorrectManagerTypeException("Connect() can only be called on client NetManagers");
 
 			//connect to server
@@ -527,7 +527,7 @@ namespace DoorNet.Shared.Networking
 		/// <param name="reason">The reason for them being dropped</param>
 		public void DropClient(NetHandle client, string reason = "")
 		{
-			if (Side == ManagerType.Client)
+			if (Side == Side.Client)
 				throw new IncorrectManagerTypeException("DropClient() can only be called on server NetManagers");
 
 			ServerEvents.InvokeOnClientDisconnect(client, reason);
@@ -550,7 +550,7 @@ namespace DoorNet.Shared.Networking
 		/// <param name="reason">The reason the client disconnected</param>
 		public void ClientDropSelf(bool causedBySelf = true, string reason = "")
 		{
-			if (Side == ManagerType.Server)
+			if (Side == Side.Server)
 				throw new IncorrectManagerTypeException("ClientDropSelf() can only be called on client NetManagers");
 
 			InUse = false;

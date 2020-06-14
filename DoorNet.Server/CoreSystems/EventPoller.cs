@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
-namespace DoorNet.Server.CoreSystems
+namespace DoorNet.Server
 {
 	public class EventPoller : MonoBehaviour
 	{
 		private void Update()
 		{
-			DoorNetServer.NetworkManager.PollEvents();
+			GameServer.NetworkManager.PollEvents();
 		}
 	}
 }
