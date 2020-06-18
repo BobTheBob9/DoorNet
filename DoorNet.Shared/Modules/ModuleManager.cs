@@ -9,13 +9,13 @@ using DoorNet.Shared.Networking;
 namespace DoorNet.Shared.Modules
 {
 	/// <summary>
-	/// Manages DoorNet modules
+	/// Static class for loading DoorNet modules
 	/// </summary>
 	public static class ModuleManager
 	{
 		/// <summary>
-		/// Initialises all modules that match the side given in all currently loaded assemblies 
-		/// The caller's assembly's modules are initialised first
+		/// Initialises all modules that match the side given in all currently loaded assemblies.
+		/// The caller's assembly's modules are initialised first.
 		/// </summary>
 		/// <param name="side"></param>
 		public static void LoadModules(Side side)
@@ -37,17 +37,26 @@ namespace DoorNet.Shared.Modules
 				{
 					var moduleAttribute = (DoorNetModuleAttribute)attribute;
 					if (moduleAttribute.Side != side)
-						continue;
+						continue; //wrong side
 
-					MethodInfo method = type.GetMethod("Initialise");
+					foreach (MethodInfo method in type.GetMethods())
+						foreach (Attribute methodAttribute in method.GetCustomAttributes(typeof(DoorNetModuleInitialiserAttribute), false))
+						{
+							//todo: throw error if no default constructor or if target method is not parameterless
 
-					if (method.IsStatic)
-						method.Invoke(null, new object[0]);
-					else
-					{
-						object instance = Activator.CreateInstance(type);
-						method.Invoke(instance, new object[0]);
-					}
+							var initAttribute = (DoorNetModuleInitialiserAttribute)methodAttribute;
+							if (initAttribute.IsSided && initAttribute.Side != side) //wrong side
+								continue;
+
+							if (method.IsStatic) //invoke statically if static
+								method.Invoke(null, new object[0]);
+							else
+							{
+								object instance = Activator.CreateInstance(type); //create obj
+								if (!method.IsConstructor) //if constructor is marked we would've already called it on creation
+									method.Invoke(instance, new object[0]); //call marked method
+							}
+						}
 				}
 		}
 	}

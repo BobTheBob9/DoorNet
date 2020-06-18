@@ -12,15 +12,13 @@ using Reactor.API.Logging;
 namespace DoorNet.Server
 {
 	/// <summary>
-	/// The DoorNet gameserver
+	/// Static class for managing the DoorNet gameserver
 	/// </summary>
 	public static class GameServer
 	{
 		public static Log Logger;
 		public static NetManager NetworkManager;
 		public static HarmonyInstance Harmony;
-
-		private static EventPoller Poller;
 
 		/// <summary>
 		/// Starts the DoorNet gameserver
@@ -37,10 +35,6 @@ namespace DoorNet.Server
 			ModuleManager.LoadModules(Side.Server);
 
 			NetworkManager.StartServer();
-
-			GameObject gm = new GameObject("DoorNet::Testing::EventPoller");
-			GameObject.DontDestroyOnLoad(gm);
-			Poller = gm.AddComponent<EventPoller>();
 		}
 	}
 }

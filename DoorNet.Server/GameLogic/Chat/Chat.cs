@@ -10,12 +10,16 @@ namespace DoorNet.Server.GameLogic
 {
 	using static GameServer;
 
+	/// <summary>
+	/// Static class for handling the sending of chat messages
+	/// </summary>
 	[DoorNetModule(Side.Server)]
 	public static class ChatManager
 	{
 		public static NetHandler ChatHandler;
 
-		public static void Initialise()
+		[DoorNetModuleInitialiser]
+		private static void Initialise()
 		{
 			//init a handler for chat and listen for messages
 			ChatHandler = NetworkManager.Handle("DoorNet::Chat");
@@ -23,6 +27,11 @@ namespace DoorNet.Server.GameLogic
 				=> Send(Encoding.Unicode.GetString(data), sender.Name));
 		}
 
+		/// <summary>
+		/// Broadcasts a chat message to all clients
+		/// </summary>
+		/// <param name="message">The message to be sent</param>
+		/// <param name="sender">The message's displayed sender, "SYSTEM" by default</param>
 		public static void Send(string message, string sender = "SYSTEM")
 		{
 			//construct, log and send a message to all clients

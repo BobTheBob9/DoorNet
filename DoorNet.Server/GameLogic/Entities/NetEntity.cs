@@ -10,6 +10,9 @@ using DoorNet.Shared.Networking.Extensions;
 
 namespace DoorNet.Server.GameLogic
 {
+	/// <summary>
+	/// Represents a GameObject syncronised across clients and servers
+	/// </summary>
 	public class NetEntity
 	{
 		public ushort ID;
@@ -21,6 +24,11 @@ namespace DoorNet.Server.GameLogic
 			GameObject = obj;
 		}
 
+		/// <summary>
+		/// Updates the position of a networked entity, broadcasting the update to clients
+		/// </summary>
+		/// <param name="pos">The new position of the entity</param>
+		/// <param name="rot">The new rotation of the entity</param>
 		public void UpdatePosition(Vector3 pos, Quaternion rot)
 		{
 			//construct packet
@@ -31,7 +39,7 @@ namespace DoorNet.Server.GameLogic
 
 			byte[] fullData = idData.Append(posData).Append(rotData);
 
-			//send
+			//broadcast
 			NetEntityManager.EntityPositionHandler.Broadcast(fullData, SendMode.Udp);
 		}
 	}

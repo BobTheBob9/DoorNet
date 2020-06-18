@@ -12,6 +12,9 @@ namespace DoorNet.Server.GameLogic
 {
 	using static GameServer;
 
+	/// <summary>
+	/// Static class for managing networked entities
+	/// </summary>
 	[DoorNetModule(Side.Server)]
 	public static class NetEntityManager
 	{
@@ -21,16 +24,22 @@ namespace DoorNet.Server.GameLogic
 		public static NetHandler EntityCreationHandler;
 		public static NetHandler EntityDestructionHandler;
 
-		public static void Initialise()
+		[DoorNetModuleInitialiser]
+		private static void Initialise()
 		{
+			//create handlers
 			EntityPositionHandler = NetworkManager.Handle("DoorNet::Entities::Position");
 			EntityCreationHandler = NetworkManager.Handle("DoorNet::Entities::Creation");
 			EntityDestructionHandler = NetworkManager.Handle("DoorNet::Entities::Destruction");
 
-			//todo: assign entities unique ushort ids on creation which are then used as handles to them from that point
-			//also probably make it so that normal classes can't mess with the entity dict at some point
+			//todo: probably make it so that normal classes can't mess with the entity dict at some point
 		}
 
+		/// <summary>
+		/// Creates a networked entity from a preexisting GameObject
+		/// </summary>
+		/// <param name="obj">The object to be created as a networked entity</param>
+		/// <returns>The created networked entity</returns>
 		public static NetEntity CreateEntity(GameObject obj)
 		{
 			//generate an id and create an obj
@@ -43,6 +52,7 @@ namespace DoorNet.Server.GameLogic
 				id++;
 			}
 
+			//create obj
 			NetEntity entity = new NetEntity(id, obj);
 			Entities.Add(id, entity);
 
@@ -51,7 +61,7 @@ namespace DoorNet.Server.GameLogic
 			//byte[] data = fuck do this later
 			//EntityCreationHandler.Broadcast(data, SendMode.Tcp);
 
-			return entity; //create obj
+			return entity;
 		}
 	}
 }

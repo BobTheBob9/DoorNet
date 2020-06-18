@@ -9,6 +9,8 @@ using Reactor.API.Runtime.Patching;
 using Reactor.API.Logging;
 
 using UnityEngine;
+using DoorNet.Shared.Modules;
+using DoorNet.Shared.Networking;
 
 namespace DoorNet.Client
 {
@@ -28,6 +30,8 @@ namespace DoorNet.Client
 			//note: these might end up being reworked to use our own harmonyinstance rather than centrifuge's simple patching methods to control whether certain patches do or don't get applied
 			RuntimePatcher.RunTranspilers();
 			RuntimePatcher.AutoPatch();
+
+			ModuleManager.LoadModules(Side.Client);
 
 			Logger.Info("Initialised DoorNet.Client successfully!");
 		}
