@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\DoorNetModuleAttribute.cs" />
+    <Compile Include="Modules\DoorNetModuleInitialiserAttribute.cs" />
     <Compile Include="Modules\ModuleManager.cs" />
     <Compile Include="Networking\Enums\ManagerType.cs" />
     <Compile Include="Networking\Enums\SendMode.cs" />

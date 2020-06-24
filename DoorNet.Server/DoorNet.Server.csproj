@@ -68,7 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoreSystems\EventPoller.cs" />
+    <Compile Include="EventPoller.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="GameLogic\Chat\Chat.cs" />
     <Compile Include="GameLogic\Entities\NetEntityManager.cs" />
