@@ -9,8 +9,8 @@ using Reactor.API.Runtime.Patching;
 using Reactor.API.Logging;
 
 using UnityEngine;
+using BobNet;
 using DoorNet.Shared.Modules;
-using DoorNet.Shared.Networking;
 
 namespace DoorNet.Client
 {

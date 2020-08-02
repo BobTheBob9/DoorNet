@@ -3,44 +3,124 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using BobNet;
 using UnityEngine;
-using DoorNet.Server.Extensions;
+using DoorNet.Shared.Modules;
 using DoorNet.Shared.Networking;
-using DoorNet.Shared.Networking.Extensions;
+using DoorNet.Shared.Registries;
 
 namespace DoorNet.Server.GameLogic
 {
-	/// <summary>
-	/// Represents a GameObject syncronised across clients and servers
-	/// </summary>
-	public class NetEntity
-	{
-		public ushort ID;
-		public GameObject GameObject;
+	using static GameServer;
 
-		internal NetEntity(ushort id, GameObject obj)
+	/// <summary>
+	/// Represents a GameObject syncronised across the network
+	/// </summary>
+	[DoorNetModule(Side.Server)]
+	public class NetEntity : MonoBehaviour
+	{
+		public static SortedDictionary<ushort, NetEntity> Entities { get; private set; } = new SortedDictionary<ushort, NetEntity>();
+
+		public static NetChannel EntityPositionChannel { get; private set; }
+		public static NetChannel EntityRotationChannel { get; private set; }
+		public static NetChannel EntityCreationChannel { get; private set; }
+		public static NetChannel EntityEnablingChannel { get; private set; }
+		public static NetChannel EntityDestructionChannel { get; private set; }
+
+		public bool Alive { get; private set; } = true;
+
+		public ushort ID { get; private set; }
+		public ushort PrefabID { get; private set; }
+
+		[DoorNetModuleInitialiser]
+		private static void Initialise()
 		{
-			ID = id;
-			GameObject = obj;
+			//create handlers
+			EntityPositionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Position", new IDMappedDataChannel(new Vector3Channel()));
+			EntityRotationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Rotation", new IDMappedDataChannel(new QuaternionChannel()));
+			EntityCreationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Creation", new IDMappedDataChannel(new UShortChannel()));
+			EntityEnablingChannel = NetworkManager.CreateChannel("DoorNet::Entities::Enabling", new IDMappedDataChannel(new BooleanChannel()));
+			EntityDestructionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Destruction", new UShortChannel());
+
+			//todo: probably make it so that normal classes can't mess with the entity dict at some point
 		}
 
 		/// <summary>
-		/// Updates the position of a networked entity, broadcasting the update to clients
+		/// Creates a networked entity from a preexisting gameobject
 		/// </summary>
-		/// <param name="pos">The new position of the entity</param>
-		/// <param name="rot">The new rotation of the entity</param>
-		public void UpdatePosition(Vector3 pos, Quaternion rot)
+		/// <param name="obj">The object to be created as a networked entity</param>
+		/// <returns>The created networked entity</returns>
+		public static NetEntity CreateEntity(GameObject obj, NetClient[] clientsToSendTo = null)
 		{
-			//construct packet
-			byte[] idData = BitConverter.GetBytes(ID);
+			//generate an id and create an obj
+			ushort id = 0;
+			foreach (var pair in Entities)
+			{
+				if (pair.Key != id)
+					break; //id is available
 
-			byte[] posData = pos.ToByteArray();
-			byte[] rotData = rot.eulerAngles.ToByteArray();
+				id++;
+			}
 
-			byte[] fullData = idData.Append(posData).Append(rotData);
+			var registryContainer = obj.GetComponent<NetEntityRegistry.PrefabRegistryContainer>();
 
-			//broadcast
-			NetEntityManager.EntityPositionHandler.Broadcast(fullData, SendMode.Udp);
+			if (registryContainer == null)
+				throw new InvalidOperationException("Cannot create a NetEntity from an unregistered prefab");
+
+			NetEntity createdEntity = obj.AddComponent<NetEntity>();
+
+			createdEntity.ID = id;
+			createdEntity.PrefabID = (ushort)registryContainer.ID;
+
+			Entities.Add(id, createdEntity);
+			IDMappedDataChannel.Container sentContainer = new IDMappedDataChannel.Container(id, createdEntity.PrefabID);
+			if (clientsToSendTo == null)
+				EntityCreationChannel.BroadcastSerialized(SendMode.Tcp, sentContainer);
+			else
+				foreach (NetClient client in clientsToSendTo)
+					EntityCreationChannel.SendSerialized(SendMode.Tcp, sentContainer, client);
+
+			return createdEntity;
+		}
+
+		/// <summary>
+		/// Broadcasts the position of a networked entity to clients
+		/// </summary>
+		/// <param name="position">The broadcasted position of the entity</param>
+		public void UpdatePosition(Vector3 position)
+		 => EntityPositionChannel.BroadcastSerialized(SendMode.Udp, new IDMappedDataChannel.Container(ID, position));
+
+		/// <summary>
+		/// Broadcasts the current position of a networked entity to clients
+		/// </summary>
+		public void UpdatePosition()
+		 => UpdatePosition(transform.position);
+
+		/// <summary>
+		/// Broadcasts the rotation of a networked entity to clients
+		/// </summary>
+		/// <param name="rotation">The broadcasted rotation of the entity</param>
+		public void UpdateRotation(Quaternion rotation)
+		 => EntityRotationChannel.BroadcastSerialized(SendMode.Udp, new IDMappedDataChannel.Container(ID, rotation));
+
+		/// <summary>
+		/// Broadcasts the current rotation of a networked entity to clients
+		/// </summary>
+		public void UpdateRotation()
+		 => UpdateRotation(transform.rotation);
+
+		private void OnEnable()
+		 => EntityEnablingChannel.BroadcastSerialized(SendMode.Tcp, new IDMappedDataChannel.Container(ID, true));
+
+		private void OnDisable()
+		 => EntityEnablingChannel.BroadcastSerialized(SendMode.Tcp, new IDMappedDataChannel.Container(ID, false));
+
+		private void OnDestroy()
+		{
+			Alive = false;
+
+			Entities.Remove(ID);
+			EntityDestructionChannel.BroadcastSerialized(SendMode.Tcp, ID);
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-using DoorNet.Shared.Networking;
+using BobNet;
 
 namespace DoorNet.Shared.Modules
 {
@@ -36,25 +36,45 @@ namespace DoorNet.Shared.Modules
 				foreach (Attribute attribute in type.GetCustomAttributes(typeof(DoorNetModuleAttribute), false))
 				{
 					var moduleAttribute = (DoorNetModuleAttribute)attribute;
-					if (moduleAttribute.Side != side)
+					if (!moduleAttribute.IsBoth && moduleAttribute.Side != side)
 						continue; //wrong side
 
 					foreach (MethodInfo method in type.GetMethods())
 						foreach (Attribute methodAttribute in method.GetCustomAttributes(typeof(DoorNetModuleInitialiserAttribute), false))
 						{
 							//todo: throw error if no default constructor or if target method is not parameterless
+							ParameterInfo[] paramInfo = method.GetParameters();
+							if (paramInfo.Length > 0 && !(paramInfo.Length == 1 && paramInfo[0].ParameterType == typeof(Side))) //pain
+								continue;
 
 							var initAttribute = (DoorNetModuleInitialiserAttribute)methodAttribute;
 							if (initAttribute.IsSided && initAttribute.Side != side) //wrong side
 								continue;
 
 							if (method.IsStatic) //invoke statically if static
-								method.Invoke(null, new object[0]);
+							{
+								if (paramInfo.Length == 0)
+									method.Invoke(null, new object[0]); //call marked method
+								else //paramInfo is (Side callingSide)
+									method.Invoke(null, new object[] { side });
+							}
 							else
 							{
-								object instance = Activator.CreateInstance(type); //create obj
-								if (!method.IsConstructor) //if constructor is marked we would've already called it on creation
-									method.Invoke(instance, new object[0]); //call marked method
+								if (method.IsConstructor)
+								{
+									if (paramInfo.Length == 0)
+										Activator.CreateInstance(type); //call marked method
+									else //paramInfo is (Side callingSide)
+										Activator.CreateInstance(type, new object[] { side });
+								}
+								else //if constructor is marked we would've already called it on creation
+								{
+									object instance = Activator.CreateInstance(type);
+									if (paramInfo.Length == 0)
+										method.Invoke(instance, new object[0]); //call marked method
+									else //paramInfo is (Side callingSide)
+										method.Invoke(instance, new object[] { side });
+								}
 							}
 						}
 				}

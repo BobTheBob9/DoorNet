@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using BobNet;
 using DoorNet.Shared.Modules;
 using DoorNet.Shared.Networking;
 
@@ -14,17 +15,17 @@ namespace DoorNet.Server.GameLogic
 	/// Static class for handling the sending of chat messages
 	/// </summary>
 	[DoorNetModule(Side.Server)]
-	public static class ChatManager
+	public static class Chat
 	{
-		public static NetHandler ChatHandler;
+		public static NetChannel ChatChannel;
 
 		[DoorNetModuleInitialiser]
 		private static void Initialise()
 		{
-			//init a handler for chat and listen for messages
-			ChatHandler = NetworkManager.Handle("DoorNet::Chat");
-			ChatHandler.Listen((byte[] data, NetHandle sender) 
-				=> Send(Encoding.Unicode.GetString(data), sender.Name));
+			//create a channel for chat and listen for messages
+			ChatChannel = NetworkManager.CreateChannel("DoorNet::Chat", new StringChannel(Encoding.Unicode));
+			ChatChannel.OnRecieveSerialized += (object data, NetClient client)
+			 => Send((string)data, client.GetPlayer().Name);
 		}
 
 		/// <summary>
@@ -35,11 +36,15 @@ namespace DoorNet.Server.GameLogic
 		public static void Send(string message, string sender = "SYSTEM")
 		{
 			//construct, log and send a message to all clients
-			string fullMessage = $"[{sender}] {message}";
-			Logger.Info(fullMessage);
+			string fullMessage;
 
-			byte[] data = Encoding.Unicode.GetBytes(fullMessage);
-			ChatHandler.Broadcast(data, SendMode.Tcp);
+			if (sender.Length > 0)
+				fullMessage = $"[{sender}] {message}";
+			else
+				fullMessage = message;
+
+			Logger.Info(fullMessage);
+			ChatChannel.BroadcastSerialized(SendMode.Tcp, fullMessage);
 		}
 	}
 }

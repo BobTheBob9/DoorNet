@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DoorNet.Shared</RootNamespace>
     <AssemblyName>DoorNet.Shared</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,8 +31,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BobNet">
+      <HintPath>..\..\..\..\source\repos\BobNet\BobNet\bin\Debug\BobNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -38,26 +44,24 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Get To The Orange Door\Get To The Orange Door_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\DoorNetModuleAttribute.cs" />
     <Compile Include="Modules\DoorNetModuleInitialiserAttribute.cs" />
     <Compile Include="Modules\ModuleManager.cs" />
-    <Compile Include="Networking\Enums\ManagerType.cs" />
-    <Compile Include="Networking\Enums\SendMode.cs" />
-    <Compile Include="Networking\Exceptions\IncorrectManagerTypeException.cs" />
-    <Compile Include="Networking\Exceptions\NetManagerInUseException.cs" />
-    <Compile Include="Networking\Extensions\ArrayExtensions.cs" />
-    <Compile Include="Networking\Manager\ClientEvents.cs" />
-    <Compile Include="Networking\Manager\NetManager.cs" />
-    <Compile Include="Networking\Manager\ServerEvents.cs" />
-    <Compile Include="Networking\NetHandle.cs" />
-    <Compile Include="Networking\NetHandler.cs" />
-    <Compile Include="Networking\PacketListSyncronisationPacket.cs" />
-    <Compile Include="Networking\TcpThreadPacket.cs" />
-    <Compile Include="Networking\UdpHandshakePacket.cs" />
-    <Compile Include="Networking\UdpThreadPacket.cs" />
+    <Compile Include="Networking\Channels\BooleanChannel.cs" />
+    <Compile Include="Networking\Channels\Entities\NetEntityCreationChannel.cs" />
+    <Compile Include="Networking\Channels\Entities\ShootingChannel.cs" />
+    <Compile Include="Networking\Channels\IDMappedDataChannel.cs" />
+    <Compile Include="Networking\Channels\QuaternionChannel.cs" />
+    <Compile Include="Networking\Channels\StringChannel.cs" />
+    <Compile Include="Networking\Channels\UShortChannel.cs" />
+    <Compile Include="Networking\Channels\Vector3Channel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Registries\Registry.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

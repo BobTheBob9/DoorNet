@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using DoorNet.Shared.Networking;
+using BobNet;
 
 namespace DoorNet.Shared.Modules
 {
@@ -15,7 +15,13 @@ namespace DoorNet.Shared.Modules
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 	public class DoorNetModuleAttribute : Attribute
 	{
+		public bool IsBoth = false;
 		public Side Side;
+
+		public DoorNetModuleAttribute()
+		{
+			IsBoth = true;
+		}
 
 		public DoorNetModuleAttribute(Side side)
 		{

@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DoorNet.Client</RootNamespace>
     <AssemblyName>DoorNet.Client</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
@@ -37,6 +40,9 @@
     </Reference>
     <Reference Include="Assembly-CSharp.dev">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Get To The Orange Door\Get To The Orange Door_Data\Managed\Assembly-CSharp.dev.dll</HintPath>
+    </Reference>
+    <Reference Include="BobNet">
+      <HintPath>..\..\..\..\source\repos\BobNet\BobNet\bin\Debug\BobNet.dll</HintPath>
     </Reference>
     <Reference Include="LitJSON, Version=0.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LitJson.0.15.0\lib\net40\LitJSON.dll</HintPath>
@@ -65,6 +71,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameClient.cs" />
+    <Compile Include="GameLogic\Entities\Player\LocalPlayer.cs" />
+    <Compile Include="GameLogic\Entities\RemoteEntity.cs" />
+    <Compile Include="GameLogic\Entities\RemoteEntityRegistry.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -81,6 +91,11 @@
       <Project>{e21c78f5-6da8-4384-8321-4647564e11eb}</Project>
       <Name>DoorNet.Shared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GameLogic\Chat\" />
+    <Folder Include="GameLogic\Entities\Player\Patches\" />
+    <Folder Include="Menus\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
