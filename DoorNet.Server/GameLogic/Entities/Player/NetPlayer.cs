@@ -53,6 +53,14 @@ namespace DoorNet.Server.GameLogic
 			ShootingChannel = NetworkManager.CreateChannel("DoorNet::Player::Shooting", new QuaternionChannel());
 			ClientPlayerCreationChannel = NetworkManager.CreateChannel("DoorNet::CreateClientPlayer", new UShortChannel());
 
+			OnClientJoin += CreatePlayer;
+			OnClientLeave += (NetClient client, string reason) =>
+			{
+				foreach (NetPlayer player in _Players)
+					if (player.Client == client)
+						Destroy(player);
+			};
+
 			NameChannel.OnRecieveSerialized += (object data, NetClient sender) =>
 			{
 				NetPlayer player = sender.GetPlayer();

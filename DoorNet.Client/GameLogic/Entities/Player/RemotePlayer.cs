@@ -10,6 +10,8 @@ using DoorNet.Shared.Modules;
 
 namespace DoorNet.Client.GameLogic
 {
+	using static GameClient;
+
 	[DoorNetModule(Side.Client)]
 	public class RemotePlayer : MonoBehaviour
 	{

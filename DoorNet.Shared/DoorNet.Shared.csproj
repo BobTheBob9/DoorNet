@@ -34,7 +34,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BobNet">
+    <Reference Include="BobNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\source\repos\BobNet\BobNet\bin\Debug\BobNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />

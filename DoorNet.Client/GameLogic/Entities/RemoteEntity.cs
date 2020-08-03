@@ -29,6 +29,8 @@ namespace DoorNet.Client.GameLogic
 
 		public ushort ID { get; private set; }
 		public ushort PrefabID { get; private set; }
+		public Vector3 NetworkPosition { get; private set; }
+		public Quaternion NetworkRotation { get; private set; }
 
 		[DoorNetModuleInitialiser]
 		private static void Initialise()
@@ -45,7 +47,11 @@ namespace DoorNet.Client.GameLogic
 				if (!Entities.ContainsKey(container.ID))
 					return;
 
-				Entities[container.ID].transform.position = (Vector3)container.Data;
+
+				Vector3 position = (Vector3)container.Data;
+				RemoteEntity entity = Entities[container.ID];
+				entity.NetworkPosition = position;
+				entity.transform.position = position;
 			};
 
 			EntityRotationChannel.OnRecieveSerialized += (object objData, NetClient sender) =>
@@ -54,7 +60,10 @@ namespace DoorNet.Client.GameLogic
 				if (!Entities.ContainsKey(container.ID))
 					return;
 
-				Entities[container.ID].transform.rotation = (Quaternion)container.Data;
+				Quaternion rotation = (Quaternion)container.Data;
+				RemoteEntity entity = Entities[container.ID];
+				entity.NetworkRotation = rotation;
+				entity.transform.rotation = rotation;
 			};
 
 			EntityCreationChannel.OnRecieveSerialized += (object objData, NetClient sender) =>

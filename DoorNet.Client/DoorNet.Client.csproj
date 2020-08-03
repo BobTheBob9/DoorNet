@@ -39,9 +39,10 @@
       <HintPath>..\packages\Lib.Harmony.1.2.0.1\lib\net35\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp.dev">
-      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Get To The Orange Door\Get To The Orange Door_Data\Managed\Assembly-CSharp.dev.dll</HintPath>
+      <HintPath>E:\SteamLibrary\steamapps\common\Get To The Orange Door\Get To The Orange Door_Data\Managed\Assembly-CSharp.dev.dll</HintPath>
     </Reference>
-    <Reference Include="BobNet">
+    <Reference Include="BobNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\source\repos\BobNet\BobNet\bin\Debug\BobNet.dll</HintPath>
     </Reference>
     <Reference Include="LitJSON, Version=0.15.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -72,9 +73,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameClient.cs" />
-    <Compile Include="GameLogic\Entities\Player\LocalPlayer.cs" />
+    <Compile Include="GameLogic\Entities\Player\ClientPlayer.cs" />
+    <Compile Include="GameLogic\Entities\Player\RemotePlayer.cs" />
     <Compile Include="GameLogic\Entities\RemoteEntity.cs" />
     <Compile Include="GameLogic\Entities\RemoteEntityRegistry.cs" />
+    <Compile Include="Menus\Console\DefaultCommands.cs" />
+    <Compile Include="Menus\Console\CustomConsole.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -95,7 +99,7 @@
   <ItemGroup>
     <Folder Include="GameLogic\Chat\" />
     <Folder Include="GameLogic\Entities\Player\Patches\" />
-    <Folder Include="Menus\" />
+    <Folder Include="Menus\Title Screen\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -42,6 +42,7 @@ namespace DoorNet.Server.GameLogic
 			EntityEnablingChannel = NetworkManager.CreateChannel("DoorNet::Entities::Enabling", new IDMappedDataChannel(new BooleanChannel()));
 			EntityDestructionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Destruction", new UShortChannel());
 
+			OnClientJoin += SendEntitiesToNewClient;
 			//todo: probably make it so that normal classes can't mess with the entity dict at some point
 		}
 
@@ -81,6 +82,12 @@ namespace DoorNet.Server.GameLogic
 					EntityCreationChannel.SendSerialized(SendMode.Tcp, sentContainer, client);
 
 			return createdEntity;
+		}
+
+		private static void SendEntitiesToNewClient(NetClient client)
+		{
+			foreach (NetEntity entity in Entities.Values)
+				EntityCreationChannel.SendSerialized(SendMode.Tcp, new IDMappedDataChannel.Container(entity.ID, entity.PrefabID), client);
 		}
 
 		/// <summary>

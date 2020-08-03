@@ -11,6 +11,7 @@ using Reactor.API.Logging;
 using UnityEngine;
 using BobNet;
 using DoorNet.Shared.Modules;
+using DoorNet.Client.Menus;
 
 namespace DoorNet.Client
 {
@@ -27,11 +28,8 @@ namespace DoorNet.Client
 			Manager = manager;
 			Logger = LogManager.GetForCurrentAssembly();
 
-			//note: these might end up being reworked to use our own harmonyinstance rather than centrifuge's simple patching methods to control whether certain patches do or don't get applied
-			RuntimePatcher.RunTranspilers();
-			RuntimePatcher.AutoPatch();
-
-			ModuleManager.LoadModules(Side.Client);
+			CustomConsole.PatchConsole();
+			CustomConsole.RegisterDefaultCommands();
 
 			Logger.Info("Initialised DoorNet.Client successfully!");
 		}

@@ -25,7 +25,7 @@ namespace DoorNet.Client
 		public static bool ConnectedToLocalServer { get; private set; } = false;
 
 		public static Log Logger { get; private set; }
-		public static HarmonyInstance Harmony { get; private set; }
+		public static HarmonyInstance Harmony { get; private set; } = HarmonyInstance.Create(Mod.ModID);
 		public static NetManager NetworkManager { get; private set; }
 
 		private static GameClient EventPoller;
@@ -65,7 +65,6 @@ namespace DoorNet.Client
 			Created = true;
 
 			Logger = LogManager.GetForCurrentAssembly();
-			Harmony = HarmonyInstance.Create(Mod.ModID);
 			NetworkManager = NetManager.CreateClient();
 
 			ModuleManager.LoadModules(Side.Client);
@@ -77,7 +76,20 @@ namespace DoorNet.Client
 		{
 			foreach (NetEvent nEvent in NetworkManager.PollEvents())
 			{
-				//idk lol do this later
+				switch (nEvent.EventType)
+				{
+					case NetEventType.ConnectionComplete:
+						{
+
+							break;
+						}
+
+					case NetEventType.DisconnectedSelf:
+						{
+
+							break;
+						}
+				}
 			}
 		}
 	}

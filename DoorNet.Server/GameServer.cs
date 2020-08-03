@@ -16,6 +16,12 @@ namespace DoorNet.Server
 	/// </summary>
 	public class GameServer : MonoBehaviour
 	{
+		public delegate void OnClientJoinHandler(NetClient client);
+		public delegate void OnClientLeaveHandler(NetClient client, string reason);
+
+		public static event OnClientJoinHandler OnClientJoin;
+		public static event OnClientLeaveHandler OnClientLeave;
+
 		public static bool Created { get; private set; } = false;
 
 		public static Log Logger { get; private set; }
@@ -51,7 +57,22 @@ namespace DoorNet.Server
 		{
 			foreach (NetEvent nEvent in NetworkManager.PollEvents())
 			{
-				//idk lol do this later
+				switch (nEvent.EventType)
+				{
+					case NetEventType.ClientConnected:
+						{
+							ClientConnectedEvent connectionEvent = (ClientConnectedEvent)nEvent;
+							OnClientJoin?.Invoke(connectionEvent.ConnectedClient);
+							break;
+						}
+
+					case NetEventType.ClientDisconnected:
+						{
+							ClientDisconnectedEvent disconnectEvent = (ClientDisconnectedEvent)nEvent;
+							OnClientLeave?.Invoke(disconnectEvent.DisconnectedClient, disconnectEvent.DisconnectReason);
+							break;
+						}
+				}
 			}
 		}
 	}
