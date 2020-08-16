@@ -11,9 +11,9 @@ namespace DoorNet.Server.GameLogic
 
 		public string Name { get; private set; } 
 
-		public NetPlayerWeapon(NetPlayerInventory inventory)
+		public static NetPlayerWeapon FromWeaponscript()
 		{
-			Inventory = inventory;
+			throw new NotImplementedException();
 		}
 
 		public void ShootPrimary()

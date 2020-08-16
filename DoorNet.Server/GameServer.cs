@@ -8,6 +8,7 @@ using BobNet;
 using DoorNet.Shared.Modules;
 
 using Reactor.API.Logging;
+using DoorNet.Server.GameLogic;
 
 namespace DoorNet.Server
 {
@@ -36,13 +37,19 @@ namespace DoorNet.Server
 		public static void Create()
 		{
 			Logger = LogManager.GetForCurrentAssembly();
+			Logger.Info("Creating server...");
+
 			Harmony = HarmonyInstance.Create("com.github.BobTheBob9/DoorNet.Server");
 			NetworkManager = NetManager.CreateServer(44444);
+			NetworkManager.ClientTimeoutTime = TimeSpan.Zero;
+			NetEntityRegistry.Instance = new NetEntityRegistry();
 
 			ModuleManager.LoadModules(Side.Server);
 
 			EventPoller = new GameObject("DoorNet::EventPoller").AddComponent<GameServer>();
 			NetworkManager.StartServer();
+
+			Logger.Info("Server created successfully!");
 		}
 
 		/// <summary>

@@ -81,6 +81,7 @@ namespace DoorNet.Server.GameLogic
 				foreach (NetClient client in clientsToSendTo)
 					EntityCreationChannel.SendSerialized(SendMode.Tcp, sentContainer, client);
 
+			createdEntity.gameObject.SetActive(true);
 			return createdEntity;
 		}
 

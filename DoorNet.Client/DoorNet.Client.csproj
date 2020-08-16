@@ -62,7 +62,8 @@
       <HintPath>..\packages\Centrifuge.GameSupport.GTTOD.1.0.1\lib\net40\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Centrifuge.GameSupport.GTTOD.1.0.1\lib\net40\UnityEngine.CoreModule.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\SteamLibrary\steamapps\common\Get To The Orange Door\Get To The Orange Door_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Centrifuge.GameSupport.GTTOD.1.0.1\lib\net40\UnityEngine.IMGUIModule.dll</HintPath>
@@ -73,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameClient.cs" />
+    <Compile Include="GameLogic\Chat\Chat.cs" />
+    <Compile Include="GameLogic\Chat\ChatGui.cs" />
+    <Compile Include="GameLogic\Entities\AI\InfantryPatches.cs" />
     <Compile Include="GameLogic\Entities\Player\ClientPlayer.cs" />
     <Compile Include="GameLogic\Entities\Player\RemotePlayer.cs" />
     <Compile Include="GameLogic\Entities\RemoteEntity.cs" />
@@ -97,7 +101,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GameLogic\Chat\" />
     <Folder Include="GameLogic\Entities\Player\Patches\" />
     <Folder Include="Menus\Title Screen\" />
   </ItemGroup>

@@ -44,7 +44,7 @@ namespace DoorNet.Shared.Networking
 
 			byte[] fullData = new byte[sizeof(ushort) + inheritedData.Data.Length];
 			Array.Copy(idData, 0, fullData, 0, idData.Length);
-			Array.Copy(inheritedData.Data, 0, idData, sizeof(ushort), inheritedData.Data.Length);
+			Array.Copy(inheritedData.Data, 0, fullData, sizeof(ushort), inheritedData.Data.Length);
 
 			return new SerializationResult<byte[]>(true, fullData);
 		}
@@ -59,7 +59,11 @@ namespace DoorNet.Shared.Networking
 			byte[] dataWithoutID = new byte[data.Length - sizeof(ushort)];
 			Array.Copy(data, sizeof(ushort), dataWithoutID, 0, dataWithoutID.Length);
 
-			return InheritedChannel.DeserializeData(dataWithoutID, client);
+			SerializationResult<object> inheritedData = InheritedChannel.DeserializeData(dataWithoutID, client);
+			if (!inheritedData.ShouldSend)
+				return SerializationResult<object>.Failure;
+
+			return new SerializationResult<object>(true, new Container(id, inheritedData.Data));
 		}
 	}
 }

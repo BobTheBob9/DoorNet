@@ -47,8 +47,8 @@ namespace DoorNet.Client.GameLogic
 				if (!Entities.ContainsKey(container.ID))
 					return;
 
-
 				Vector3 position = (Vector3)container.Data;
+
 				RemoteEntity entity = Entities[container.ID];
 				entity.NetworkPosition = position;
 				entity.transform.position = position;
@@ -106,6 +106,9 @@ namespace DoorNet.Client.GameLogic
 			entity.ID = id;
 			entity.PrefabID = prefabId;
 			Entities.Add(id, entity);
+			entity.gameObject.SetActive(true);
+
+			Logger.Info($"Client: Created entity {RemoteEntityRegistry.Instance.Entries[id]}");
 		}
 	}
 }

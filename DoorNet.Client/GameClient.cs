@@ -11,6 +11,7 @@ using Harmony;
 using BobNet;
 using DoorNet.Server;
 using DoorNet.Shared.Modules;
+using DoorNet.Client.GameLogic;
 
 using Reactor.API.Logging;
 
@@ -44,12 +45,11 @@ namespace DoorNet.Client
 		/// </summary>
 		public static void HostLocalServer()
 		{
+			ConnectedToLocalServer = true;
 			Create();
 
 			GameServer.Create();
 			NetworkManager.ConnectLocal(GameServer.NetworkManager);
-
-			ConnectedToLocalServer = true;
 		}
 
 		/// <summary>
@@ -62,14 +62,21 @@ namespace DoorNet.Client
 
 		private static void Create()
 		{
-			Created = true;
+			if (Created)
+				return;
 
 			Logger = LogManager.GetForCurrentAssembly();
-			NetworkManager = NetManager.CreateClient();
+			Logger.Info("Creating client...");
 
+			Created = true;
+
+			RemoteEntityRegistry.Instance = new RemoteEntityRegistry();
+			NetworkManager = NetManager.CreateClient();
 			ModuleManager.LoadModules(Side.Client);
 
 			EventPoller = new GameObject("DoorNet::EventPoller").AddComponent<GameClient>();
+
+			Logger.Info("Client created successfully!");
 		}
 
 		private void Update()

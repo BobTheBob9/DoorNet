@@ -16,12 +16,18 @@ namespace DoorNet.Shared.Modules
 	{
 		public Side Side;
 		public bool IsSided = false;
+		public int Priority = 0;
 
-		public DoorNetModuleInitialiserAttribute() { }
-		public DoorNetModuleInitialiserAttribute(Side side)
+		public DoorNetModuleInitialiserAttribute(int priority = 0) 
+		{
+			Priority = priority;
+		}
+
+		public DoorNetModuleInitialiserAttribute(Side side, int priority = 0)
 		{
 			Side = side;
 			IsSided = true;
+			Priority = priority;
 		}
 	}
 }

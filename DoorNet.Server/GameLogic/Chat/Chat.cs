@@ -46,5 +46,18 @@ namespace DoorNet.Server.GameLogic
 			Logger.Info(fullMessage);
 			ChatChannel.BroadcastSerialized(SendMode.Tcp, fullMessage);
 		}
+
+		public static void SendTo(NetClient reciever, string message, string sender = "SYSTEM")
+		{
+			string fullMessage;
+
+			if (sender.Length > 0)
+				fullMessage = $"[{sender} => {reciever.GetPlayer().Name}] {message}";
+			else
+				fullMessage = message;
+
+			Logger.Info(fullMessage);
+			ChatChannel.SendSerialized(SendMode.Tcp, fullMessage, reciever);
+		}
 	}
 }

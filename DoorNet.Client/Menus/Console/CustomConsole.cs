@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using Harmony;
 
@@ -14,17 +15,22 @@ namespace DoorNet.Client.Menus
 	{
 		public delegate void Command(string[] args);
 
-		internal static Dictionary<string, Command> Commands;
+		internal static Dictionary<string, Command> Commands = new Dictionary<string, Command>();
 
 		public static void RegisterCommand(string name, Command command)
 		 => Commands.Add(name.ToLower(), command);
 
 		internal static void PatchConsole()
-		 => Harmony.Patch(typeof(ac_Console).GetMethod("Submit"), postfix: new HarmonyMethod(typeof(CustomConsole).GetMethod("Patch")));
-
-		private static void Patch(string ConsoleSubmission)
 		{
-			string[] fullCommand = ConsoleSubmission.Split(' ');
+			Harmony.Patch(typeof(ac_Console).GetMethod("Submit", BindingFlags.Public | BindingFlags.Instance), 
+				postfix: new HarmonyMethod(typeof(CustomConsole).GetMethod("RunCommand", BindingFlags.NonPublic | BindingFlags.Static)));
+			Harmony.Patch(typeof(ac_Console).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance),
+				postfix: new HarmonyMethod(typeof(CustomConsole).GetMethod("CheckDnsTask", BindingFlags.NonPublic | BindingFlags.Static)));
+		}
+
+		private static void RunCommand(string ConsoleSubmission)
+		{
+			string[] fullCommand = ConsoleSubmission.Substring(2).Split(' ');
 			if (fullCommand.Length == 0)
 				return;
 

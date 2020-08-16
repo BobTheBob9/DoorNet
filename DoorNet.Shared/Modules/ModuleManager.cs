@@ -32,52 +32,55 @@ namespace DoorNet.Shared.Modules
 
 		private static void InstantiateTypes(Side side, Assembly asm)
 		{
+			int maxPrio = 0;
+			var methods = new Dictionary<int, List<Tuple<Type, MethodInfo, DoorNetModuleInitialiserAttribute>>>(); //pain
+			List<int> lastPriorityIndex = new List<int>();
 			foreach (Type type in asm.GetTypes())
-				foreach (Attribute attribute in type.GetCustomAttributes(typeof(DoorNetModuleAttribute), false))
+			{
+				var moduleAttribute = type.GetCustomAttribute<DoorNetModuleAttribute>();
+				if (moduleAttribute == null || (!moduleAttribute.IsBoth && moduleAttribute.Side != side))
+					continue;
+
+				foreach (MethodInfo method in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
 				{
-					var moduleAttribute = (DoorNetModuleAttribute)attribute;
-					if (!moduleAttribute.IsBoth && moduleAttribute.Side != side)
-						continue; //wrong side
+					//todo: throw error if no default constructor or if target method is not parameterless
+					//also like 10-20% of this probably shits itself with multiple initialisers per class but i do not fucking care rn i just want this shit to work
+					var methodAttribute = method.GetCustomAttribute<DoorNetModuleInitialiserAttribute>();
+					if (methodAttribute == null)
+						continue;
 
-					foreach (MethodInfo method in type.GetMethods())
-						foreach (Attribute methodAttribute in method.GetCustomAttributes(typeof(DoorNetModuleInitialiserAttribute), false))
-						{
-							//todo: throw error if no default constructor or if target method is not parameterless
-							ParameterInfo[] paramInfo = method.GetParameters();
-							if (paramInfo.Length > 0 && !(paramInfo.Length == 1 && paramInfo[0].ParameterType == typeof(Side))) //pain
-								continue;
+					if (!methods.ContainsKey(methodAttribute.Priority))
+					{
+						methods.Add(methodAttribute.Priority, new List<Tuple<Type, MethodInfo, DoorNetModuleInitialiserAttribute>>());
+						if (methodAttribute.Priority > maxPrio)
+							maxPrio = methodAttribute.Priority;
+					}
 
-							var initAttribute = (DoorNetModuleInitialiserAttribute)methodAttribute;
-							if (initAttribute.IsSided && initAttribute.Side != side) //wrong side
-								continue;
-
-							if (method.IsStatic) //invoke statically if static
-							{
-								if (paramInfo.Length == 0)
-									method.Invoke(null, new object[0]); //call marked method
-								else //paramInfo is (Side callingSide)
-									method.Invoke(null, new object[] { side });
-							}
-							else
-							{
-								if (method.IsConstructor)
-								{
-									if (paramInfo.Length == 0)
-										Activator.CreateInstance(type); //call marked method
-									else //paramInfo is (Side callingSide)
-										Activator.CreateInstance(type, new object[] { side });
-								}
-								else //if constructor is marked we would've already called it on creation
-								{
-									object instance = Activator.CreateInstance(type);
-									if (paramInfo.Length == 0)
-										method.Invoke(instance, new object[0]); //call marked method
-									else //paramInfo is (Side callingSide)
-										method.Invoke(instance, new object[] { side });
-								}
-							}
-						}
+					methods[methodAttribute.Priority].Add(new Tuple<Type, MethodInfo, DoorNetModuleInitialiserAttribute>(type, method, methodAttribute));
 				}
+			}
+
+			for (int i = 0; i < maxPrio + 1; i++)
+				if (methods.ContainsKey(i))
+					foreach (var tuple in methods[i])
+					{
+						ParameterInfo[] paramInfo = tuple.Item2.GetParameters();
+						if ((paramInfo.Length > 0 && !(paramInfo.Length == 1 && paramInfo[0].ParameterType == typeof(Side))) || (tuple.Item3.IsSided && tuple.Item3.Side != side)) //pain
+							continue;
+
+						object[] methodArgs = paramInfo.Length == 0 ? new object[0] : new object[] { side };
+
+						if (tuple.Item2.IsConstructor)
+							Activator.CreateInstance(tuple.Item1, methodArgs);
+						else
+						{
+							object instance = null;
+							if (!tuple.Item2.IsStatic)
+								instance = Activator.CreateInstance(tuple.Item1);
+
+							tuple.Item2.Invoke(instance, methodArgs);
+						}
+					}
 		}
 	}
 }

@@ -53,12 +53,15 @@ namespace DoorNet.Server.GameLogic
 			ShootingChannel = NetworkManager.CreateChannel("DoorNet::Player::Shooting", new QuaternionChannel());
 			ClientPlayerCreationChannel = NetworkManager.CreateChannel("DoorNet::CreateClientPlayer", new UShortChannel());
 
+			//PositionChannel.CreatePreprocessor(new RatelimitPreprocessor(TimeSpan.FromSeconds(5))); //temp
+			//RotationChannel.CreatePreprocessor(new RatelimitPreprocessor(TimeSpan.FromSeconds(5))); //also temp
+
 			OnClientJoin += CreatePlayer;
 			OnClientLeave += (NetClient client, string reason) =>
 			{
-				foreach (NetPlayer player in _Players)
-					if (player.Client == client)
-						Destroy(player);
+				NetPlayer player = client.GetPlayer();
+				Chat.Send($"{player.Name} left the game");
+				Destroy(player);
 			};
 
 			NameChannel.OnRecieveSerialized += (object data, NetClient sender) =>
@@ -68,6 +71,7 @@ namespace DoorNet.Server.GameLogic
 				{
 					player.Name = (string)data;
 					Chat.Send($"{player.Name} joined the game");
+					Chat.SendTo(sender, "Welcome to bob's cool server lol (this text should be changed to a configurable motd later!!!", string.Empty);
 				}
 			};
 
@@ -84,6 +88,7 @@ namespace DoorNet.Server.GameLogic
 			{
 				Vector3 pos = (Vector3)data;
 				NetPlayer player = sender.GetPlayer();
+
 				if (player != null)
 				{
 					player.transform.position = pos;
@@ -132,6 +137,8 @@ namespace DoorNet.Server.GameLogic
 			ClientPlayerCreationChannel.SendSerialized(SendMode.Tcp, player.Entity.ID, client);
 
 			player.Inventory = new NetPlayerInventory(player);
+
+			_Players.Add(player);
 		}
 
 		public void DoAction(NetPlayerAction action)

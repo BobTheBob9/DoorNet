@@ -43,7 +43,7 @@ namespace DoorNet.Client.GameLogic
 				PlayerObject = GameManager.GM.Player;
 				Instance = PlayerObject.AddComponent<ClientPlayer>();
 
-				NameChannel.SendSerialized(SendMode.Tcp, "fuck idk figure out names later", NetworkManager.Server);
+				NameChannel.SendSerialized(SendMode.Tcp, "placeholdernamebecauseihaventactuallyimplementedawayofsettingthoseclientsideyet", NetworkManager.Server);
 			};
 
 			PositionChannel.OnRecieveSerialized += (object data, NetClient sender) =>
@@ -59,9 +59,8 @@ namespace DoorNet.Client.GameLogic
 
 		private void FixedUpdate()
 		{
-			//temp code redo later
-			PositionChannel.SendSerialized(SendMode.Udp, transform.position, NetworkManager.Server);
-			RotationChannel.SendSerialized(SendMode.Udp, transform.rotation, NetworkManager.Server);
+			PositionChannel.SendSerialized(SendMode.Udp, PlayerObject.transform.position, NetworkManager.Server);
+			RotationChannel.SendSerialized(SendMode.Udp, PlayerObject.transform.rotation, NetworkManager.Server);
 		}
 	}
 }
