@@ -77,10 +77,12 @@
     <Compile Include="GameLogic\Chat\Chat.cs" />
     <Compile Include="GameLogic\Chat\ChatGui.cs" />
     <Compile Include="GameLogic\Entities\AI\InfantryPatches.cs" />
+    <Compile Include="GameLogic\Entities\BulletScriptPatches.cs" />
     <Compile Include="GameLogic\Entities\Player\ClientPlayer.cs" />
     <Compile Include="GameLogic\Entities\Player\RemotePlayer.cs" />
     <Compile Include="GameLogic\Entities\RemoteEntity.cs" />
     <Compile Include="GameLogic\Entities\RemoteEntityRegistry.cs" />
+    <Compile Include="GameLogic\Entities\RemoteEntityStateCollection.cs" />
     <Compile Include="Menus\Console\DefaultCommands.cs" />
     <Compile Include="Menus\Console\CustomConsole.cs" />
     <Compile Include="Mod.cs" />

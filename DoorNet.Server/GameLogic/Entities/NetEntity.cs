@@ -19,6 +19,10 @@ namespace DoorNet.Server.GameLogic
 	[DoorNetModule(Side.Server)]
 	public class NetEntity : MonoBehaviour
 	{
+		public delegate void OnDestructionHandler();
+		public delegate void OnEntityDestructionHandler(NetEntity entity);
+		public static event OnEntityDestructionHandler OnEntityDestruction;
+
 		public static SortedDictionary<ushort, NetEntity> Entities { get; private set; } = new SortedDictionary<ushort, NetEntity>();
 
 		public static NetChannel EntityPositionChannel { get; private set; }
@@ -26,6 +30,8 @@ namespace DoorNet.Server.GameLogic
 		public static NetChannel EntityCreationChannel { get; private set; }
 		public static NetChannel EntityEnablingChannel { get; private set; }
 		public static NetChannel EntityDestructionChannel { get; private set; }
+
+		public event OnDestructionHandler OnDestruction;
 
 		public bool Alive { get; private set; } = true;
 
@@ -38,7 +44,7 @@ namespace DoorNet.Server.GameLogic
 			//create handlers
 			EntityPositionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Position", new IDMappedDataChannel(new Vector3Channel()));
 			EntityRotationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Rotation", new IDMappedDataChannel(new QuaternionChannel()));
-			EntityCreationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Creation", new IDMappedDataChannel(new UShortChannel()));
+			EntityCreationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Creation", new NetEntityCreationChannel());
 			EntityEnablingChannel = NetworkManager.CreateChannel("DoorNet::Entities::Enabling", new IDMappedDataChannel(new BooleanChannel()));
 			EntityDestructionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Destruction", new UShortChannel());
 
@@ -74,12 +80,12 @@ namespace DoorNet.Server.GameLogic
 			createdEntity.PrefabID = (ushort)registryContainer.ID;
 
 			Entities.Add(id, createdEntity);
-			IDMappedDataChannel.Container sentContainer = new IDMappedDataChannel.Container(id, createdEntity.PrefabID);
+			NetEntityCreationChannel.CreationPacket sentPacket = new NetEntityCreationChannel.CreationPacket(id, createdEntity.PrefabID, createdEntity.transform.position, createdEntity.transform.rotation);
 			if (clientsToSendTo == null)
-				EntityCreationChannel.BroadcastSerialized(SendMode.Tcp, sentContainer);
+				EntityCreationChannel.BroadcastSerialized(SendMode.Tcp, sentPacket);
 			else
 				foreach (NetClient client in clientsToSendTo)
-					EntityCreationChannel.SendSerialized(SendMode.Tcp, sentContainer, client);
+					EntityCreationChannel.SendSerialized(SendMode.Tcp, sentPacket, client);
 
 			createdEntity.gameObject.SetActive(true);
 			return createdEntity;
@@ -88,7 +94,7 @@ namespace DoorNet.Server.GameLogic
 		private static void SendEntitiesToNewClient(NetClient client)
 		{
 			foreach (NetEntity entity in Entities.Values)
-				EntityCreationChannel.SendSerialized(SendMode.Tcp, new IDMappedDataChannel.Container(entity.ID, entity.PrefabID), client);
+				EntityCreationChannel.SendSerialized(SendMode.Tcp, new NetEntityCreationChannel.CreationPacket(entity.ID, entity.PrefabID, entity.transform.position, entity.transform.rotation), client);
 		}
 
 		/// <summary>
@@ -126,6 +132,8 @@ namespace DoorNet.Server.GameLogic
 		private void OnDestroy()
 		{
 			Alive = false;
+			OnDestruction?.Invoke();
+			OnEntityDestruction?.Invoke(this);
 
 			Entities.Remove(ID);
 			EntityDestructionChannel.BroadcastSerialized(SendMode.Tcp, ID);

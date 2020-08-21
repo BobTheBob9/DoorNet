@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using BobNet;
 using UnityEngine;
 using DoorNet.Shared.Registries;
 
@@ -17,6 +18,8 @@ namespace DoorNet.Client.GameLogic
 		}
 
 		public static RemoteEntityRegistry Instance;
+
+		internal static NetChannel SyncChannel;
 
 		public override void CreateEntry(string id, GameObject item)
 		{

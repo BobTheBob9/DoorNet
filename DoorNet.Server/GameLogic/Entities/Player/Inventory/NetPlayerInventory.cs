@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using BobNet;
@@ -11,6 +10,8 @@ namespace DoorNet.Server.GameLogic
 	[DoorNetModule(Side.Server)]
 	public class NetPlayerInventory
 	{
+		public static List<NetPlayerWeapon> GlobalWeapons = new List<NetPlayerWeapon>();
+
 		public NetPlayer Player { get; private set; }
 
 		public int SelectedIndex { get; private set; }
@@ -19,7 +20,10 @@ namespace DoorNet.Server.GameLogic
 		[DoorNetModuleInitialiser]
 		private static void Initialise()
 		{
-			//convert andre weaponscripts into NetPlayerWeapons
+			return;
+
+			foreach (WeaponItem weapon in GameManager.GM.Player.GetComponent<InventoryScript>().Weapons)
+				GlobalWeapons.Add(NetPlayerWeapon.FromWeaponscript(weapon));
 		}
 
 		public NetPlayerInventory(NetPlayer player)

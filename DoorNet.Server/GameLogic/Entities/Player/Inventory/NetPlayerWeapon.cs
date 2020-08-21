@@ -11,8 +11,17 @@ namespace DoorNet.Server.GameLogic
 
 		public string Name { get; private set; } 
 
-		public static NetPlayerWeapon FromWeaponscript()
+		public static NetPlayerWeapon FromWeaponscript(WeaponItem item)
 		{
+			WeaponScript weaponObj = item.WeaponObject;
+			if (weaponObj.PrimaryBullet != null && !NetEntityRegistry.Instance.ContainsItem(weaponObj.PrimaryBullet))
+				NetEntityRegistry.Instance.CreateEntry($"DoorNet::WeaponBullet{weaponObj.PrimaryBullet.name}", weaponObj.PrimaryBullet);
+
+			if (weaponObj.SecondaryBullet != null && !NetEntityRegistry.Instance.ContainsItem(weaponObj.SecondaryBullet))
+				NetEntityRegistry.Instance.CreateEntry($"DoorNet::WeaponBullet{weaponObj.SecondaryBullet.name}", weaponObj.SecondaryBullet);
+
+			//todo convert into netplayerweapon
+
 			throw new NotImplementedException();
 		}
 

@@ -19,6 +19,10 @@ namespace DoorNet.Client.GameLogic
 	[DoorNetModule(Side.Client)]
 	public class RemoteEntity : MonoBehaviour
 	{
+		public delegate void OnDestructionHandler();
+		public delegate void OnEntityDestructionHandler(RemoteEntity entity);
+		public static event OnEntityDestructionHandler OnEntityDestruction;
+
 		public static Dictionary<ushort, RemoteEntity> Entities { get; private set; } = new Dictionary<ushort, RemoteEntity>();
 
 		public static NetChannel EntityPositionChannel { get; private set; }
@@ -26,6 +30,8 @@ namespace DoorNet.Client.GameLogic
 		public static NetChannel EntityCreationChannel { get; private set; }
 		public static NetChannel EntityEnablingChannel { get; private set; }
 		public static NetChannel EntityDestructionChannel { get; private set; }
+
+		public event OnDestructionHandler OnDestruction;
 
 		public ushort ID { get; private set; }
 		public ushort PrefabID { get; private set; }
@@ -37,14 +43,14 @@ namespace DoorNet.Client.GameLogic
 		{
 			EntityPositionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Position", new IDMappedDataChannel(new Vector3Channel()));
 			EntityRotationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Rotation", new IDMappedDataChannel(new QuaternionChannel()));
-			EntityCreationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Creation", new IDMappedDataChannel(new UShortChannel()));
+			EntityCreationChannel = NetworkManager.CreateChannel("DoorNet::Entities::Creation", new NetEntityCreationChannel());
 			EntityEnablingChannel = NetworkManager.CreateChannel("DoorNet::Entities::Enabling", new IDMappedDataChannel(new BooleanChannel()));
 			EntityDestructionChannel = NetworkManager.CreateChannel("DoorNet::Entities::Destruction", new UShortChannel());
 
 			EntityPositionChannel.OnRecieveSerialized += (object objData, NetClient sender) =>
 			{
 				IDMappedDataChannel.Container container = (IDMappedDataChannel.Container)objData;
-				if (!Entities.ContainsKey(container.ID))
+				if (!Entities.ContainsKey(container.ID) || Entities[container.ID] == null)
 					return;
 
 				Vector3 position = (Vector3)container.Data;
@@ -57,7 +63,7 @@ namespace DoorNet.Client.GameLogic
 			EntityRotationChannel.OnRecieveSerialized += (object objData, NetClient sender) =>
 			{
 				IDMappedDataChannel.Container container = (IDMappedDataChannel.Container)objData;
-				if (!Entities.ContainsKey(container.ID))
+				if (!Entities.ContainsKey(container.ID) || Entities[container.ID] == null)
 					return;
 
 				Quaternion rotation = (Quaternion)container.Data;
@@ -68,14 +74,19 @@ namespace DoorNet.Client.GameLogic
 
 			EntityCreationChannel.OnRecieveSerialized += (object objData, NetClient sender) =>
 			{
-				IDMappedDataChannel.Container container = (IDMappedDataChannel.Container)objData;
-				CreateEntity(container.ID, (ushort)container.Data, Instantiate(RemoteEntityRegistry.Instance.Items[(ushort)container.Data]));
+				NetEntityCreationChannel.CreationPacket creationPacket = (NetEntityCreationChannel.CreationPacket)objData;
+
+				GameObject gm = Instantiate(RemoteEntityRegistry.Instance.Items[creationPacket.PrefabID]);
+				CreateEntity(creationPacket.ID, creationPacket.PrefabID, gm);
+
+				gm.transform.position = creationPacket.Position;
+				gm.transform.rotation = creationPacket.Rotation;
 			};
 
 			EntityEnablingChannel.OnRecieveSerialized += (object objData, NetClient sender) =>
 			{
 				IDMappedDataChannel.Container container = (IDMappedDataChannel.Container)objData;
-				if (!Entities.ContainsKey(container.ID))
+				if (!Entities.ContainsKey(container.ID) || Entities[container.ID] == null)
 					return;
 
 				Entities[container.ID].gameObject.SetActive((bool)container.Data);
@@ -87,7 +98,14 @@ namespace DoorNet.Client.GameLogic
 				if (!Entities.ContainsKey(id))
 					return;
 
-				Destroy(Entities[id].gameObject);
+				if (Entities[id] != null)
+				{
+					Entities[id].OnDestruction?.Invoke();
+					OnEntityDestruction?.Invoke(Entities[id]);
+					Destroy(Entities[id].gameObject);
+				}
+
+				Entities.Remove(id);
 			};
 		}
 
@@ -108,7 +126,7 @@ namespace DoorNet.Client.GameLogic
 			Entities.Add(id, entity);
 			entity.gameObject.SetActive(true);
 
-			Logger.Info($"Client: Created entity {RemoteEntityRegistry.Instance.Entries[id]}");
+			Logger.Info($"Client: Created entity {RemoteEntityRegistry.Instance.Entries[prefabId]}");
 		}
 	}
 }

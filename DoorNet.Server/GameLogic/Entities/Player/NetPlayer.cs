@@ -36,6 +36,7 @@ namespace DoorNet.Server.GameLogic
 		public NetEntity Entity { get; private set; }
 
 		public NetPlayerInventory Inventory { get; private set; }
+		public int Health { get; private set; }
 
 		[DoorNetModuleInitialiser]
 		private static void Initialise() 
@@ -157,6 +158,11 @@ namespace DoorNet.Server.GameLogic
 						break;
 					}
 			}
+		}
+
+		public void Damage(int amount)
+		{
+
 		}
 
 		private void OnDestroy()

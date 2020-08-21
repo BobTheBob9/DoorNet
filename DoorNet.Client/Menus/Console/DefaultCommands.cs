@@ -95,7 +95,7 @@ namespace DoorNet.Client.Menus
 			if (args.Length < 1)
 				return;
 
-			GameObject.Instantiate(GTTODPrefabs.GetPrefab(args[0]), GameManager.GM.Player.transform.position, GameManager.GM.transform.rotation);
+			GameObject.Instantiate(GTTODPrefabs.GetPrefab(args[0]), GameManager.GM.Player.transform.position, GameManager.GM.transform.rotation).SetActive(true);
 		}
 	}
 }

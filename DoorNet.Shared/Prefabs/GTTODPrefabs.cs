@@ -19,7 +19,7 @@ namespace DoorNet.Shared.Prefabs
 		private static List<Scene> LoadedScenes = new List<Scene>();
 		private static Dictionary<string, GameObject> Prefabs = new Dictionary<string, GameObject>();
 
-		public static void Initialise()
+		public static void Initialise() 
 		{
 			if (Initialised)
 				return;

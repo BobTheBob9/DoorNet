@@ -40,7 +40,13 @@ namespace DoorNet.Shared.Registries
 		public virtual T GetItem(string id)
 		 => _Items[_Entries.IndexOf(id)];
 
-		public void SyncroniseChannels(SyncableStringArrayChannel channel)
+		public virtual bool ContainsEntry(string entry)
+		 => _Entries.Contains(entry);
+
+		public virtual bool ContainsItem(T item)
+		 => _Items.Contains(item);
+
+		public void SyncroniseEntries(SyncableStringArrayChannel channel)
 		{
 			//send strings to server, reorganise channels on recieve
 			void onClientRecieve(object data, NetClient client)
@@ -52,6 +58,7 @@ namespace DoorNet.Shared.Registries
 
 				List<int> invalidIndexes = new List<int>();
 				string[] newEntries = new string[_Entries.Count];
+				T[] newItems = new T[_Items.Count];
 				int j = 0;
 				for (int i = 0; i < array.Indexes.Length; i++)
 				{
@@ -61,13 +68,18 @@ namespace DoorNet.Shared.Registries
 						continue;
 					}
 
-					newEntries[j] = _Entries[i];
+					newEntries[j] = _Entries[array.Indexes[i]];
+					newItems[j] = _Items[array.Indexes[i]];
 					j++;
 				}
 
 				for (int i = 0; i < invalidIndexes.Count; i++)
+				{
 					newEntries[i + j] = _Entries[invalidIndexes[i]];
+					newItems[i + j] = _Items[invalidIndexes[i]];
+				}
 
+				_Items = new List<T>(newItems);
 				_Entries = new List<string>(newEntries);
 
 				channel.OnRecieveSerialized -= onClientRecieve;
@@ -79,7 +91,7 @@ namespace DoorNet.Shared.Registries
 			channel.SendSerialized(SendMode.Tcp, sentArray, channel.Manager.Server);
 		}
 
-		public void ListenForChannelSyncronisation(SyncableStringArrayChannel channel)
+		public void ListenForEntrySyncronisation(SyncableStringArrayChannel channel)
 		{
 			channel.OnRecieveSerialized += (object data, NetClient client) =>
 			{

@@ -70,8 +70,11 @@ namespace DoorNet.Client
 
 			Created = true;
 
-			RemoteEntityRegistry.Instance = new RemoteEntityRegistry();
 			NetworkManager = NetManager.CreateClient();
+
+			RemoteEntityRegistry.Instance = new RemoteEntityRegistry();
+			RemoteEntityRegistry.SyncChannel = NetworkManager.CreateChannel("DoorNet::EntityRegistrySync", new SyncableStringArrayChannel());
+
 			ModuleManager.LoadModules(Side.Client);
 
 			EventPoller = new GameObject("DoorNet::EventPoller").AddComponent<GameClient>();
@@ -87,7 +90,7 @@ namespace DoorNet.Client
 				{
 					case NetEventType.ConnectionComplete:
 						{
-
+							RemoteEntityRegistry.Instance.SyncroniseEntries((SyncableStringArrayChannel)RemoteEntityRegistry.SyncChannel);
 							break;
 						}
 

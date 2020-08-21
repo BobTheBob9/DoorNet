@@ -43,9 +43,6 @@ namespace DoorNet.Client.GameLogic
 			Instance = new GameObject().AddComponent<ChatGui>();
 			Chat.OnRecieveMessage += AddMessage;
 			DisplayCount = 10;
-
-			for (int i = 0; i < 5; i++)
-				AddMessage("test message " + i);
 		}
 
 		public static void AddMessage(string message)

@@ -24,6 +24,10 @@ namespace DoorNet.Server
 		public static event OnClientLeaveHandler OnClientLeave;
 
 		public static bool Created { get; private set; } = false;
+		public static bool IsLocalServer
+		{
+			get => Created || NetworkManager.Clients[0].IsLocal;
+		}
 
 		public static Log Logger { get; private set; }
 		public static HarmonyInstance Harmony { get; private set; }
@@ -43,6 +47,7 @@ namespace DoorNet.Server
 			NetworkManager = NetManager.CreateServer(44444);
 			NetworkManager.ClientTimeoutTime = TimeSpan.Zero;
 			NetEntityRegistry.Instance = new NetEntityRegistry();
+			NetEntityRegistry.Instance.ListenForEntrySyncronisation((SyncableStringArrayChannel)NetworkManager.CreateChannel("DoorNet::EntityRegistrySync", new SyncableStringArrayChannel())); //tfw 192 cols
 
 			ModuleManager.LoadModules(Side.Server);
 
